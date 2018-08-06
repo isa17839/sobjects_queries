@@ -1,4 +1,4 @@
-# sobjects_queries
+# sobjects_queries - any feedback is highly appreciated!
 Allows to do queries to Apex SObjects using dynamic object name, clauses etc.
 
 Examples of usage:
