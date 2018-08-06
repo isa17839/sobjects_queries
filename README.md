@@ -4,9 +4,11 @@ Allows to do queries to Apex SObjects using dynamic object name, clauses etc.
 Examples of usage:
 
 // Get list of objects
+
 SObject[] cases = SO.getList('Case', new String[]{'Id', 'Name'});
 
 // Get list of objects with clauses
+
 SObject[] assets = SO.getList(
     'Asset', new String[]{'Id', 'Name', 'CustomField__c'},
     new List<SO.Clause>{
@@ -16,6 +18,7 @@ SObject[] assets = SO.getList(
 );
         
 // Get map of objects with clauses
+
 Map<String, SObject> accounts = SO.getMap(
     'Account', new String[]{'Id', 'Name'},
     new List<SO.Clause>{
