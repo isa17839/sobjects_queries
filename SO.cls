@@ -15,6 +15,10 @@ public class SO {
         System.debug('query: ' + query);
         return Database.query(query);
     }
+	
+    public static SObject[] getList(String SObjectName, String[] fieldsNames) {
+        return getList(SObjectName, fieldsNames, new List<Clause>{});
+    }	
 
     public static Map<String, SObject> getMap(String SObjectName, String[] fieldsNames, List<Clause> whereClauses, String mapField) {
         String query = 'SELECT ' + String.join(fieldsNames, ', ') + ' FROM ' + SObjectName + ' ';
@@ -28,6 +32,13 @@ public class SO {
         return result;
     }
 
+    public static String getSingleField(String SObjectName, String[] fieldsNames, List<Clause> whereClauses) {
+        String query = 'SELECT ' + String.join(fieldsNames, ', ') + ' FROM ' + SObjectName + ' ';
+        query += getWhereClause(SObjectName, whereClauses);
+        SObject[] objects = Database.query(query);
+        return objects.isEmpty() ? '' : (String) objects.get(0).get(fieldsNames.get(0));
+    }	
+	
     public static Schema.DisplayType getFieldType(String sObjectName, String fieldName) {
         Schema.SObjectType t = Schema.getGlobalDescribe().get(sObjectName);
         Schema.DescribeSObjectResult r = t.getDescribe();
