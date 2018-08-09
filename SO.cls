@@ -4,21 +4,30 @@
  * --- Changelog
  *
  * v1.0 Igor Savchenko 2018-07-12
+ * v1.1 Igor Savchenko 2018-08-09
  *
- * @version 1.0
+ * @version 1.1
  */
 public class SO {
 
     public static SObject[] getList(String SObjectName, String[] fieldsNames, List<Clause> whereClauses) {
         String query = 'SELECT ' + String.join(fieldsNames, ', ') + ' FROM ' + SObjectName + ' ';
         query += getWhereClause(SObjectName, whereClauses);
-        System.debug('query: ' + query);
         return Database.query(query);
     }
-	
+
+    public static SObject[] getList(String SObjectName, String[] fieldsNames, List<Clause> whereClauses, String orderString) {
+        String query = 'SELECT ' + String.join(fieldsNames, ', ') + ' FROM ' + SObjectName + ' ';
+        query += getWhereClause(SObjectName, whereClauses);
+        if (!String.isBlank(orderString)) {
+            query += 'ORDER BY ' + orderString;
+        }
+        return Database.query(query);
+    }
+
     public static SObject[] getList(String SObjectName, String[] fieldsNames) {
         return getList(SObjectName, fieldsNames, new List<Clause>{});
-    }	
+    }
 
     public static Map<String, SObject> getMap(String SObjectName, String[] fieldsNames, List<Clause> whereClauses, String mapField) {
         String query = 'SELECT ' + String.join(fieldsNames, ', ') + ' FROM ' + SObjectName + ' ';
@@ -37,8 +46,8 @@ public class SO {
         query += getWhereClause(SObjectName, whereClauses);
         SObject[] objects = Database.query(query);
         return objects.isEmpty() ? '' : (String) objects.get(0).get(fieldsNames.get(0));
-    }	
-	
+    }
+
     public static Schema.DisplayType getFieldType(String sObjectName, String fieldName) {
         Schema.SObjectType t = Schema.getGlobalDescribe().get(sObjectName);
         Schema.DescribeSObjectResult r = t.getDescribe();
@@ -60,6 +69,14 @@ public class SO {
         return fields;
     }
 
+    public static String[] getField(SObject[] sobjects, String field) {
+        String[] fields = new String[]{};
+        for (SObject o: sobjects) {
+            fields.add((String)o.get(field));
+        }
+        return fields;
+    }
+
     public static SObject[] setField(SObject[] sobjects, String field, String value) {
         for (SObject o: sobjects) {
             o.put(field, value);
@@ -68,33 +85,35 @@ public class SO {
     }
 
     static String getWhereClause(String SObjectName, List<Clause> whereClauses) {
-        String whereClausesString = '';
-        if (!whereClauses.isEmpty()) {
-            whereClausesString += 'WHERE ';
-            String[] whereClausesPeaces = new String[]{};
-            for (Clause whereClause: whereClauses) {
-                if (whereClause.type == '=') {
-                    if (getFieldType(SObjectName, whereClause.field) == Schema.DisplayType.BOOLEAN) {
-                        whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' = ' + String.escapeSingleQuotes(whereClause.value));
-                    } else {
-                        whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' = \'' + String.escapeSingleQuotes(whereClause.value) + '\'');
-                    }
-                }
-                if (whereClause.type == 'IN') {
-                    for (String v: whereClause.values) {
-                        v = String.escapeSingleQuotes(v);
-                    }
-                    String valuesStr = '(\'' + String.join(whereClause.values, '\',\'') + '\')';
-                    if (whereClause.values.size() == 0) {
-                        whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' IN ' + valuesStr + ' AND Id = \'0016E00000ZHb5e\' AND Id = \'0016E00000ZHb5f\' ');
-                    } else {
-                        whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' IN ' + valuesStr + ' ');
-                    }
+        if (whereClauses.isEmpty()) {
+            return '';
+        }
+
+        String whereClausesString = 'WHERE ';
+        String[] whereClausesPeaces = new String[]{};
+        for (Clause whereClause: whereClauses) {
+            if (whereClause.type == '=') {
+                if (getFieldType(SObjectName, whereClause.field) == Schema.DisplayType.BOOLEAN) {
+                    whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' = ' + String.escapeSingleQuotes(whereClause.value));
+                } else {
+                    whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' = \'' + String.escapeSingleQuotes(whereClause.value) + '\'');
                 }
             }
-            whereClausesString += String.join(whereClausesPeaces, ' AND ');
+            if (whereClause.type == 'IN') {
+                for (String v: whereClause.values) {
+                    v = String.escapeSingleQuotes(v);
+                }
+                String valuesStr = '(\'' + String.join(whereClause.values, '\',\'') + '\')';
+                if (whereClause.values.size() == 0) {
+                    whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' IN ' + valuesStr + ' AND Id = \'0016E00000ZHb5e\' AND Id = \'0016E00000ZHb5f\' ');
+                } else {
+                    whereClausesPeaces.add(String.escapeSingleQuotes(whereClause.field) + ' IN ' + valuesStr + ' ');
+                }
+            }
         }
-        return whereClausesString;
+        whereClausesString += String.join(whereClausesPeaces, ' AND ');
+
+        return whereClausesString + ' ';
     }
 
     public class Clause {

@@ -4,8 +4,9 @@
  * --- Changelog
  *
  * v1.0 Igor Savchenko 2018-07-12
+ * v1.1 Igor Savchenko 2018-08-09
  *
- * @version 1.0
+ * @version 1.1
  */
 @isTest
 public class SO_Test {
@@ -15,7 +16,7 @@ public class SO_Test {
         Account a = new Account();
         a.LastName = 'Acc1';
         a.ExtId__c = 'abc';
-        a.RecordTypeId = [SELECT Id FROM RecordType WHERE SobjectType = 'Account' AND DeveloperName = 'PersonAccount' LIMIT 1].get(0).Id;
+        a.RecordTypeId = [SELECT Id FROM RecordType WHERE SobjectType = 'Account' AND IsPersonType = true LIMIT 1].get(0).Id;
         insert a;
     }
 
@@ -31,6 +32,11 @@ public class SO_Test {
             }
         );
         System.assertEquals(1, accs.size());
+
+        SO.getList('Account', new String[]{'Id'});
+        SO.getList('Account', new String[]{'Id'}, new List<SO.Clause>{}, 'Id');
+        SO.getSingleField('Account', new String[]{'Id'}, new List<SO.Clause>{});
+        SO.getField(accs, 'Id');
 
         Map<String, SObject> accsMap = SO.getMap(
             'Account', new String[]{'LastName'},
@@ -52,7 +58,8 @@ public class SO_Test {
         );
         System.assertEquals(0, accs.size());
 
-        SO.Clause clause = new SO.Clause('Id', 'someVal', 'IN');
+        SO.Clause clause = new SO.Clause('Id', new String[]{'a', 'b', 'c'}, 'IN');
+        clause = new SO.Clause('Id', 'someVal', 'IN');
 
         Test.stopTest();
     }
