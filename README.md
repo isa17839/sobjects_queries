@@ -5,15 +5,15 @@ Examples of usage:
 
 ```
 // Get list of objects
-SObject[] cases = SO.getList('Case', new String[]{'Name'});
+SObject[] cases = SO.getList('Case', new String[]{'Name', 'CustomField__c'});
 ```
 
 ```
 // Get list of objects with clauses
 SObject[] assets = SO.getList(
-    'Asset', new String[]{'Id', 'Name', 'CustomField__c'},
+    'Asset', new String[]{'Name', 'CustomField__c'},
     new List<SO.Clause>{
-        new SO.Clause('Name', 'SomeName'),
+        new SO.Clause('Name', ''CustomField__c''),
         new SO.Clause('CustomField__c', new String[]{'Val1', 'Val2', 'Val3'}, 'IN')
     }
 );
@@ -22,7 +22,7 @@ SObject[] assets = SO.getList(
 ```
 // Get map of objects with clauses
 Map<String, SObject> accounts = SO.getMap(
-    'Account', new String[]{'Id', 'Name'},
+    'Account', new String[]{'Name', 'CustomField__c'},
     new List<SO.Clause>{
         new SO.Clause('Name', new String[]{'', ''} , 'IN'),
     },
