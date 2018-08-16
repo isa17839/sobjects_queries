@@ -5,7 +5,7 @@ Examples of usage:
 
 // Get list of objects
 
-SObject[] cases = SO.getList('Case', new String[]{'Id', 'Name'});
+SObject[] cases = SO.getList('Case', new String[]{'Name'});
 
 // Get list of objects with clauses
 
