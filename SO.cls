@@ -1,12 +1,12 @@
 /**
  * SO
  *
- * --- Changelog
+ * @description
+ * Class includes methods to work with SOQL queries dynamically, SObject collections.
  *
- * v1.0 Igor Savchenko 2018-07-12
- * v1.1 Igor Savchenko 2018-08-09
+ * @createdBy
+ * Igor Savchenko (igorsavchenko77@gmail.com)
  *
- * @version 1.1
  */
 public class SO {
 
@@ -82,6 +82,16 @@ public class SO {
             o.put(field, value);
         }
         return sobjects;
+    }
+
+    public static SObject[] filterSObjects(SObject[] sobjects, Clause clause) {
+        SObject[] filteredSobjects = new SObject[]{};
+        for (SObject sobj: sobjects) {
+            if (sobj.get(clause.field) == clause.value) {
+                filteredSobjects.add(sobj);
+            }
+        }
+        return filteredSobjects;
     }
 
     static String getWhereClause(String SObjectName, List<Clause> whereClauses) {
