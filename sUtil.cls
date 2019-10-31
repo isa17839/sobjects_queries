@@ -1,5 +1,5 @@
 /**
- * U
+ * sUtil
  *
  * @description
  * This class is basic util class for Apex
@@ -11,7 +11,7 @@
  * @version 1.0
  */
 
-public class U {
+public class sUtil {
 
     public static Integer ifNull(Integer actual, Integer ifnull) {
         return actual != null ? actual : ifnull;
@@ -57,6 +57,10 @@ public class U {
             return Date.newInstance(Integer.valueOf(dateString.split('\\.')[2]), Integer.valueOf(dateString.split('\\.')[1]), Integer.valueOf(dateString.split('\\.')[0]));
         }
         return parseDate(dateString);
+    }
+
+    public static String formatDate(Date d) {
+        return d.year() + '-' + (d.month() < 10 ? '0' : '') + d.month() + '-' + (d.day() < 10 ? '0' : '') + d.day();
     }
 
 }

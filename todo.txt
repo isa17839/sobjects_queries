@@ -1,1 +1,1 @@
-1. Avoid query for no results (if we know there will be no results before the query)
+2. Query 'IN' list of SObjects. Example: Q.whr('Id', Trigger.new).

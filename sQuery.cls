@@ -1,11 +1,11 @@
 /**
- * Q (Query)
+ * sQuery
  *
  * Eases work with SOQL queries and makes it more flexible
  *
  * @version 1.0
  */
-public class Q {
+public class sQuery {
 
     private String objectName;
     private String fields;
@@ -13,31 +13,31 @@ public class Q {
     private Integer lmt;
     private String order;
 
-    public static Q sel(String fields) {
-        Q query = new Q();
+    public static sQuery sel(String fields) {
+        sQuery query = new sQuery();
         query.fields = String.escapeSingleQuotes(fields);
         return query;
     }
 
-    public Q frm(String objectName) {
+    public sQuery frm(String objectName) {
         this.objectName = String.escapeSingleQuotes(objectName);
         return this;
     }
-    
-    public Q whr(String whereClause) {
+
+    public sQuery whr(String whereClause) {
         this.whereClauses.add('(' + whereClause + ')');
         return this;
     }
 
-    public Q whr(String field, String value) {
-        this.whereClauses.add('(' + String.escapeSingleQuotes(U.ifNull(field, '')) + ' = \''+ String.escapeSingleQuotes(U.ifNull(value, '')) +'\'' + ')');
+    public sQuery whr(String field, String value) {
+        this.whereClauses.add('(' + String.escapeSingleQuotes(sUtil.ifNull(field, '')) + ' = \''+ String.escapeSingleQuotes(sUtil.ifNull(value, '')) +'\'' + ')');
         return this;
     }
 
     /**
      * Handle 'IN' statement
      */
-    public Q whr(String field, String[] values) {
+    public sQuery whr(String field, String[] values) {
         // in this case we expect to get no resuls
         if (values.size() == 0) {
             this.whereClauses.add('(Id = null)');
@@ -45,7 +45,7 @@ public class Q {
         }
 
         for (String v: values) {
-            v = String.escapeSingleQuotes(U.ifNull(v, ''));
+            v = String.escapeSingleQuotes(sUtil.ifNull(v, ''));
         }
 
         String valuesStr = '(\'' + String.join(values, '\',\'') + '\')';
@@ -53,22 +53,33 @@ public class Q {
         return this;
     }
 
-    public Q whr(String field, Set<String> values) {
+    /**
+     * Handle 'IN' statement based on objects list
+     */
+    public sQuery whr(String field, SObject[] sobjects) {
+        String[] values = new String[]{};
+        for (SObject sobj: sobjects) {
+            values.add(sobj.Id);
+        }
+        return whr(field, values);
+    }
+
+    public sQuery whr(String field, Set<String> values) {
         String[] listValues = new String[]{};
         listValues.addAll(values);
         return whr(field, new List<String>(values));
     }
 
-    public Q whr(String field, Set<Id> values) {
+    public sQuery whr(String field, Set<Id> values) {
         return whr(field, (List<String>) new List<Id>(values));
     }
 
-    public Q lmt(Integer maxLimit) {
+    public sQuery lmt(Integer maxLimit) {
         this.lmt = maxLimit;
         return this;
     }
 
-    public Q order(String order) {
+    public sQuery order(String order) {
         this.order = order;
         return this;
     }
